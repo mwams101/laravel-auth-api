@@ -11,19 +11,12 @@ Route::get('/user', function (Request $request) {
 })->middleware(['auth:sanctum', EnsureEmailIsVerified::class]);
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+    ->name('verification.verify')->middleware('signed');
 
 
-//Route::middleware(['auth:sanctum', EnsureEmailIsVerified::class])->group(function () {
-//    Route::get('user', function (Request $request) {
-//        return $request->user();
-//    });
-//});
-
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+Route::middleware(['auth:sanctum', EnsureEmailIsVerified::class])->group(function () {
     Route::post('email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
-
     Route::post('logout', [AuthController::class, 'logout']);
 });

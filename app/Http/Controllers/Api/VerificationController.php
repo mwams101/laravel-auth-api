@@ -7,18 +7,25 @@ use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class VerificationController extends Controller
 {
-    public function verify(EmailVerificationRequest $request)
+    public function verify(Request $request, $id, $hash)
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        $user = User::findOrFail($id);
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Invalid verification link'], 403);
+        }
+
+        if ($user->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email already verified'], 200);
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
+        $user->markEmailAsVerified();
+
+        event(new Verified($user));
 
         return response()->json(['message' => 'Email has been verified']);
     }

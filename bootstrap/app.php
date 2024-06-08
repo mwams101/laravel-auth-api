@@ -14,9 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
-//        $middleware->statefulApi();
-//        $middleware->append(EnsureEmailIsVerified::class);
-//        $middleware->use([EnsureEmailIsVerified::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
